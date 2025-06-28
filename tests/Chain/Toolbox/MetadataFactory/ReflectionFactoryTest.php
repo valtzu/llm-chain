@@ -13,6 +13,7 @@ use PhpLlm\LlmChain\Platform\Contract\JsonSchema\Factory;
 use PhpLlm\LlmChain\Platform\Tool\ExecutionReference;
 use PhpLlm\LlmChain\Platform\Tool\Tool;
 use PhpLlm\LlmChain\Tests\Fixture\Tool\ToolMultiple;
+use PhpLlm\LlmChain\Tests\Fixture\Tool\ToolObject;
 use PhpLlm\LlmChain\Tests\Fixture\Tool\ToolRequiredParams;
 use PhpLlm\LlmChain\Tests\Fixture\Tool\ToolWrong;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -80,6 +81,42 @@ final class ReflectionFactoryTest extends TestCase
                     ],
                 ],
                 'required' => ['text', 'number'],
+                'additionalProperties' => false,
+            ],
+        );
+    }
+
+
+    #[Test]
+    public function getDefinitionWithObjectParameter(): void
+    {
+        /** @var Tool[] $metadatas */
+        $metadatas = iterator_to_array($this->factory->getTool(ToolObject::class));
+
+        self::assertToolConfiguration(
+            metadata: $metadatas[0],
+            className: ToolObject::class,
+            name: 'tool_object',
+            description: 'A tool with object parameter',
+            method: '__invoke',
+            parameters: [
+                'type' => 'object',
+                'properties' => [
+                    'object' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'number' => [
+                                'type' => 'integer',
+                                'description' => 'Good int',
+                            ],
+                        ],
+                        'required' => [
+                            'number',
+                        ],
+                        'additionalProperties' => false,
+                    ],
+                ],
+                'required' => ['object'],
                 'additionalProperties' => false,
             ],
         );
